@@ -3,7 +3,8 @@ import WebMidi from 'webmidi';
 import lifecycle from 'react-pure-lifecycle';
 import { observable, computed, reaction, autorun } from "mobx"
 import { now } from "mobx-utils"
-import PlayPauseButton from '../PlayPauseButton/PlayPauseButton.js';
+import PlayPauseButton from '../PlayPauseButton';
+import TrackListing from '../TrackListing';
 
 class Synth {
   @observable device = null;
@@ -15,12 +16,29 @@ class Synth {
   playNote = (note, channel, args) =>
     this.canPlayNote ?
     (() => {
-      console.log("playing", note);
-      this.device.playNote(note, channel, args);
+      console.log("playing", note, "at", channel, "with", args);
+      if (note) this.device.playNote(note, channel, args);
     })() :
     () => console.log('Waiting for device initialization');
 }
 const synth = new Synth();
+
+const arp1 = (measure, beat) => {
+  return {
+    notes: measure[beat],
+    beats: 1
+  }
+}
+const arp2 = (measure, beat) => {
+  if (beat % 2) {
+    return {
+      notes: measure[beat],
+      beats: 2
+    }
+  } else {
+    return null;
+  }
+}
 
 class Song {
     id = Math.random();
@@ -30,9 +48,11 @@ class Song {
     };
     @computed get nextNote() {
       // Assign a dummy variable to induce @computed calculation
-      const playThisBeat = this.beatCounter;
+      const playThisBeat = this.frameAdvancer;
+      // const note = this.progression[this.currentMeasure][this.currentBeat];
       const note = this.progression[this.currentMeasure][this.currentBeat];
       return note;
+
     };
     progression = [
       ["C3", "E3", "G3", "C4"],
@@ -41,25 +61,56 @@ class Song {
       ["C3", "E3", "G3", "C4"],
     ];
 
+    tracks = [
+      {
+        name: "Bass",
+        channel: 1,
+        notesFromChord: arp2
+      },
+      {
+        name: "Lead",
+        channel: 3,
+        notesFromChord: arp1
+      },
+    ];
+
     currentMeasure = 1;
     currentBeat = 1;
     beatsPerMeasure = 4;
-    @observable beatCounter = 0;
+    @observable frameAdvancer = 0;
 }
 const catchyTune = new Song();
 
-reaction(
-  () => catchyTune.nextNote,
-  nextNote => synth.playNote(nextNote, 2, {duration: 1000})
-);
-
 autorun(() => {
-  catchyTune.beatCounter = now(catchyTune.beatLengthInMs);
+  catchyTune.frameAdvancer = now(catchyTune.beatLengthInMs);
   catchyTune.currentBeat = (catchyTune.currentBeat + 1) % catchyTune.beatsPerMeasure;
   if (catchyTune.currentBeat === 0) {
     catchyTune.currentMeasure = (catchyTune.currentMeasure + 1) % catchyTune.progression.length;
   }
 });
+
+reaction(
+    () => catchyTune.frameAdvancer,
+    frameAdvancer => {
+      // Whenever the frame advancer notifies us, calculate new next notes
+      // for all the tracks. If the arpeggiator gives us new note data, play it.
+      // If the arpeggiator returns null as the nextNotes, this signifies that no
+      // new note data should be sent to the synth.
+      catchyTune.tracks.forEach(track => {
+        const currentChord = catchyTune.progression[catchyTune.currentMeasure];
+        const nextNotes = track.notesFromChord(
+          currentChord,
+          catchyTune.currentBeat);
+        if (nextNotes) {
+          synth.playNote(
+            nextNotes.notes,
+            track.channel,
+            {duration: catchyTune.beatLengthInMs * nextNotes.beats}
+          );
+        }
+      });
+    }
+);
 
 const midiDeviceMounter = {
   componentDidMount(props) {
@@ -87,8 +138,7 @@ const NotePlayer = ({ song }) => (
 
 const Player = () => (
     <div>
-      big oof
-      <br />
+      <TrackListing tracks={catchyTune.tracks} />
       <PlayPauseButton synth={synth} />
       <NotePlayer song={catchyTune} />
     </div>

@@ -1,8 +1,7 @@
 import React from 'react';
 import lifecycle from 'react-pure-lifecycle';
-import logo from './logo.svg';
 import './App.css';
-import Player from './Player/Player.js'
+import Player from './Player'
 
 const methods = {
   componentDidMount(props) {
@@ -10,14 +9,13 @@ const methods = {
   }
 };
 
-function App() {
+function BigOofSeq() {
 
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
         <p>
-          seq
+          The Big Oof Seq
         </p>
         <Player />
       </header>
@@ -25,4 +23,4 @@ function App() {
   );
 }
 
-export default lifecycle(methods)(App);
+export default lifecycle(methods)(BigOofSeq);

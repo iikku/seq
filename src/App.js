@@ -5,7 +5,7 @@ import Player from './Player'
 
 const methods = {
   componentDidMount(props) {
-    console.log("Nice");
+    console.log("Welcome to the Big Oof Seq");
   }
 };
 

@@ -9,13 +9,16 @@ const toBeat = n => ({
   _16th:_256thToExactOrNull(n, 16),
 });
 
+// quarter notes to 1/256th notes
+const beatToMicroBeat = beat => beat * 64;
+
 const notePerBeat = (chord, demisemihemidemisemiquaver) => {
   const beat = toBeat(demisemihemidemisemiquaver).quarter;
   if (beat !== null) {
     return {
       notes: chord[beat % chord.length],
-      beats: 1
-    }
+      microBeats: beatToMicroBeat(1)
+    };
   } else {
     return null;
   }
@@ -27,8 +30,8 @@ const noteEveryTwoBeats = (chord, demisemihemidemisemiquaver) => {
   if (beat !== null) {
     return {
       notes: chord[beat % chord.length],
-      beats: 2
-    }
+      microBeats: beatToMicroBeat(2)
+    };
   } else {
     return null;
   }
@@ -40,8 +43,8 @@ const slowChord = (chord, demisemihemidemisemiquaver) => {
   if (beat === 1) {
     return {
       notes: chord,
-      beats: 3
-    }
+      microBeats: beatToMicroBeat(3)
+    };
   } else {
     return null;
   }

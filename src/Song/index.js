@@ -1,20 +1,8 @@
-import { observable, computed, } from "mobx"
+import { observable } from "mobx"
 import { notePerBeat, slowChord, noteEveryTwoBeats } from '../NoteResolvers';
 
 class Song {
-    id = Math.random();
     @observable bpm = 120;
-    @computed get beatLengthInMs() {
-      return (60 * 1000) / this.bpm;
-    };
-    @computed get nextNote() {
-      // Assign a dummy variable to induce @computed calculation
-      const playThisBeat = this.frameAdvancer; // eslint-disable-line no-unused-vars
-      // const note = this.progression[this.currentMeasure][this.currentBeat];
-      const note = this.progression[this.currentMeasure][this.currentBeat];
-      return note;
-
-    };
     progression = [
       ["C3", "E3", "G3"],
       ["G3", "B3", "D4", "F4", "A4"],
@@ -42,8 +30,6 @@ class Song {
 
     currentMeasure = 0;
     currentMicroBeat = 0; // 1/256th notes from the beginning of the measure
-    beatsPerMeasure = 4;
-    @observable frameAdvancer = 0;
 }
 
 export default Song;

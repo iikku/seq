@@ -1,5 +1,5 @@
 import { observable, computed, } from "mobx"
-import { notePerBeat, noteEveryTwoBeats } from '../Arpeggiators';
+import { notePerBeat, slowChord, noteEveryTwoBeats } from '../NoteResolvers';
 
 class Song {
     id = Math.random();
@@ -29,14 +29,19 @@ class Song {
         notesFromChord: noteEveryTwoBeats
       },
       {
+        name: "Pad",
+        channel: 2,
+        notesFromChord: slowChord
+      },
+      {
         name: "Lead",
         channel: 3,
         notesFromChord: notePerBeat
       },
     ];
 
-    currentMeasure = 1;
-    currentBeat = 1;
+    currentMeasure = 0;
+    currentBeat = 0;
     beatsPerMeasure = 4;
     @observable frameAdvancer = 0;
 }

@@ -16,7 +16,19 @@ const noteEveryTwoBeats = (measure, beat) => {
   }
 }
 
+const slowChord = (measure, beat) => {
+  if (beat === 1) {
+    return {
+      notes: [measure[0], measure[1], measure[2]],
+      beats: 3
+    }
+  } else {
+    return null;
+  }
+}
+
 export {
   notePerBeat,
+  slowChord,
   noteEveryTwoBeats
 };

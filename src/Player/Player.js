@@ -14,7 +14,10 @@ class Synth {
   playPause = () => this.paused = !this.paused;
   playNote = (note, channel, args) =>
     this.canPlayNote ?
-    this.device.playNote(note, channel, args) :
+    (() => {
+      console.log("playing", note);
+      this.device.playNote(note, channel, args);
+    })() :
     () => console.log('Waiting for device initialization');
 }
 const synth = new Synth();
@@ -22,10 +25,26 @@ const synth = new Synth();
 class Song {
     id = Math.random();
     @observable bpm = 120;
-    @computed get beat() {
+    @computed get beatLengthInMs() {
       return (60 * 1000) / this.bpm;
-    }
-    @observable nextNote = null;
+    };
+    @computed get nextNote() {
+      // Assign a dummy variable to induce @computed calculation
+      const playThisBeat = this.beatCounter;
+      const note = this.progression[this.currentMeasure][this.currentBeat];
+      return note;
+    };
+    progression = [
+      ["C3", "E3", "G3", "C4"],
+      ["G3", "B3", "D4", "G4"],
+      ["F3", "A3", "C4", "F4"],
+      ["C3", "E3", "G3", "C4"],
+    ];
+
+    currentMeasure = 1;
+    currentBeat = 1;
+    beatsPerMeasure = 4;
+    @observable beatCounter = 0;
 }
 const catchyTune = new Song();
 
@@ -35,8 +54,11 @@ reaction(
 );
 
 autorun(() => {
-  console.log("now", now(catchyTune.beat));
-  synth.playNote("D4", 2, { duration: 200 });
+  catchyTune.beatCounter = now(catchyTune.beatLengthInMs);
+  catchyTune.currentBeat = (catchyTune.currentBeat + 1) % catchyTune.beatsPerMeasure;
+  if (catchyTune.currentBeat === 0) {
+    catchyTune.currentMeasure = (catchyTune.currentMeasure + 1) % catchyTune.progression.length;
+  }
 });
 
 const midiDeviceMounter = {

@@ -5,7 +5,9 @@
   "dependencies": {
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
-    "react-scripts": "3.0.1"
+    "react-pure-lifecycle": "^3.0.0",
+    "react-scripts": "3.0.1",
+    "webmidi": "^2.3.3"
   },
   "scripts": {
     "start": "react-scripts start",

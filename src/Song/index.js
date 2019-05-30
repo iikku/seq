@@ -1,8 +1,8 @@
-import { observable } from "mobx"
-import { notePerBeat, slowChord, noteEveryTwoBeats } from '../NoteResolvers';
+import { observable, computed } from "mobx"
+import { fastArp, notePerBeat, slowChord, noteEveryTwoBeats } from '../NoteResolvers';
 
 class Song {
-    @observable bpm = 120;
+    @observable bpm = 140;
     progression = [
       ["C3", "E3", "G3"],
       ["G3", "B3", "D4", "F4", "A4"],
@@ -24,7 +24,12 @@ class Song {
       {
         name: "Lead",
         channel: 3,
-        notesFromChord: notePerBeat
+        notesFromChord: (c, b) =>
+          (
+            this.currentMeasure === 3
+            ? fastArp
+            : notePerBeat
+          )(c, b)
       },
     ];
 

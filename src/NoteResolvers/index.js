@@ -1,14 +1,32 @@
-const notePerBeat = (measure, beat) => {
-  return {
-    notes: measure[beat],
-    beats: 1
+// 1/256th note to exact note timings or null if not exact
+// TODO: Add an empty optional monad instead of null
+const _256thToExactOrNull = (d, divisor) => Math.floor(d / divisor) === d / divisor ? d / divisor : null
+
+const toBeat = n => ({
+  half:_256thToExactOrNull(n, 128),
+  quarter:_256thToExactOrNull(n, 64),
+  _8th:_256thToExactOrNull(n, 32),
+  _16th:_256thToExactOrNull(n, 16),
+});
+
+const notePerBeat = (chord, demisemihemidemisemiquaver) => {
+  const beat = toBeat(demisemihemidemisemiquaver).quarter;
+  if (beat !== null) {
+    return {
+      notes: chord[beat % chord.length],
+      beats: 1
+    }
+  } else {
+    return null;
   }
 }
 
-const noteEveryTwoBeats = (measure, beat) => {
-  if (beat % 2) {
+const noteEveryTwoBeats = (chord, demisemihemidemisemiquaver) => {
+  const beat = toBeat(demisemihemidemisemiquaver).half;
+
+  if (beat !== null) {
     return {
-      notes: measure[beat],
+      notes: chord[beat % chord.length],
       beats: 2
     }
   } else {
@@ -16,10 +34,12 @@ const noteEveryTwoBeats = (measure, beat) => {
   }
 }
 
-const slowChord = (measure, beat) => {
+const slowChord = (chord, demisemihemidemisemiquaver) => {
+  const beat = toBeat(demisemihemidemisemiquaver).quarter;
+
   if (beat === 1) {
     return {
-      notes: [measure[0], measure[1], measure[2]],
+      notes: chord,
       beats: 3
     }
   } else {

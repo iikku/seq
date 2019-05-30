@@ -16,10 +16,10 @@ class Song {
 
     };
     progression = [
-      ["C3", "E3", "G3", "C4"],
-      ["G3", "B3", "D4", "G4"],
+      ["C3", "E3", "G3"],
+      ["G3", "B3", "D4", "F4", "A4"],
       ["F3", "A3", "C4", "F4"],
-      ["C3", "E3", "G3", "C4"],
+      ["C3", "E3", "G3", "B4"],
     ];
 
     tracks = [
@@ -41,7 +41,7 @@ class Song {
     ];
 
     currentMeasure = 0;
-    currentBeat = 0;
+    currentMicroBeat = 0; // 1/256th notes from the beginning of the measure
     beatsPerMeasure = 4;
     @observable frameAdvancer = 0;
 }

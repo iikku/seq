@@ -2,7 +2,7 @@ import { observable, computed } from "mobx"
 
 class Synth {
   @observable device = null;
-  @observable paused = false;
+  @observable paused = true;
   @computed get canPlayNote() {
     return this.device !== null && !this.paused;
   };

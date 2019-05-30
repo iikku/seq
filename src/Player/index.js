@@ -11,13 +11,18 @@ import Song from '../Song';
 const synth = new Synth();
 const catchyTune = new Song();
 
-// Initialize the frameAdvancer that's advanced (currently) once per beatLengthInMs
+// Initialize the frameAdvancer that's advanced once per demisemihemidemisemiquaver note - 1/256th note that is.
+// To change the granularity, refactor lots.
+const microBeatsPerMeasure = 256;
 autorun(() => {
-  catchyTune.frameAdvancer = now(catchyTune.beatLengthInMs);
+  const beatLengthInMs = (60 * 1000) / catchyTune.bpm;
+  const microBeatLengthInMs = beatLengthInMs / (microBeatsPerMeasure / 4); // quarter notes to demisemihemidemisemiquaver notes.
 
-  // If the frameAdvancer granularity is changed, the beat counter calculation must be adapted.
-  catchyTune.currentBeat = (catchyTune.currentBeat + 1) % catchyTune.beatsPerMeasure;
-  if (catchyTune.currentBeat === 0) {
+  // This will advance the song to the next step
+  catchyTune.frameAdvancer = now(microBeatLengthInMs);
+
+  catchyTune.currentMicroBeat = (catchyTune.currentMicroBeat + 1) % microBeatsPerMeasure;
+  if (catchyTune.currentMicroBeat === 0) {
     catchyTune.currentMeasure = (catchyTune.currentMeasure + 1) % catchyTune.progression.length;
   }
 });
@@ -35,7 +40,8 @@ reaction(
         const currentChord = catchyTune.progression[catchyTune.currentMeasure];
         const nextNotes = track.notesFromChord(
           currentChord,
-          catchyTune.currentBeat);
+          catchyTune.currentMicroBeat
+        );
         if (nextNotes) {
           synth.playNote(
             nextNotes.notes,
@@ -56,7 +62,7 @@ const midiDeviceMounter = {
       }
 
       // TODO: Add option to change the output on the UI
-      synth.device = WebMidi.outputs[1];
+      synth.device = WebMidi.outputs[0];
       console.log("Device set to", synth.device);
     });
   }

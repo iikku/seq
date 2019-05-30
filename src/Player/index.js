@@ -1,94 +1,29 @@
 import React from 'react';
 import WebMidi from 'webmidi';
 import lifecycle from 'react-pure-lifecycle';
-import { observable, computed, reaction, autorun } from "mobx"
+import { reaction, autorun } from "mobx"
 import { now } from "mobx-utils"
 import PlayPauseButton from '../PlayPauseButton';
 import TrackListing from '../TrackListing';
+import Synth from '../Synth';
+import Song from '../Song';
 
-class Synth {
-  @observable device = null;
-  @observable paused = false;
-  @computed get canPlayNote() {
-    return this.device !== null && !this.paused;
-  };
-  playPause = () => this.paused = !this.paused;
-  playNote = (note, channel, args) =>
-    this.canPlayNote ?
-    (() => {
-      console.log("playing", note, "at", channel, "with", args);
-      if (note) this.device.playNote(note, channel, args);
-    })() :
-    () => console.log('Waiting for device initialization');
-}
 const synth = new Synth();
-
-const arp1 = (measure, beat) => {
-  return {
-    notes: measure[beat],
-    beats: 1
-  }
-}
-const arp2 = (measure, beat) => {
-  if (beat % 2) {
-    return {
-      notes: measure[beat],
-      beats: 2
-    }
-  } else {
-    return null;
-  }
-}
-
-class Song {
-    id = Math.random();
-    @observable bpm = 120;
-    @computed get beatLengthInMs() {
-      return (60 * 1000) / this.bpm;
-    };
-    @computed get nextNote() {
-      // Assign a dummy variable to induce @computed calculation
-      const playThisBeat = this.frameAdvancer;
-      // const note = this.progression[this.currentMeasure][this.currentBeat];
-      const note = this.progression[this.currentMeasure][this.currentBeat];
-      return note;
-
-    };
-    progression = [
-      ["C3", "E3", "G3", "C4"],
-      ["G3", "B3", "D4", "G4"],
-      ["F3", "A3", "C4", "F4"],
-      ["C3", "E3", "G3", "C4"],
-    ];
-
-    tracks = [
-      {
-        name: "Bass",
-        channel: 1,
-        notesFromChord: arp2
-      },
-      {
-        name: "Lead",
-        channel: 3,
-        notesFromChord: arp1
-      },
-    ];
-
-    currentMeasure = 1;
-    currentBeat = 1;
-    beatsPerMeasure = 4;
-    @observable frameAdvancer = 0;
-}
 const catchyTune = new Song();
 
+// Initialize the frameAdvancer that's advanced (currently) once per beatLengthInMs
 autorun(() => {
   catchyTune.frameAdvancer = now(catchyTune.beatLengthInMs);
+
+  // If the frameAdvancer granularity is changed, the beat counter calculation must be adapted.
   catchyTune.currentBeat = (catchyTune.currentBeat + 1) % catchyTune.beatsPerMeasure;
   if (catchyTune.currentBeat === 0) {
     catchyTune.currentMeasure = (catchyTune.currentMeasure + 1) % catchyTune.progression.length;
   }
 });
 
+// Tie the song, the synth and the frameAdvancer timing loop together with
+// the mobx's reaction().
 reaction(
     () => catchyTune.frameAdvancer,
     frameAdvancer => {
@@ -119,6 +54,8 @@ const midiDeviceMounter = {
         console.log("WebMidi could not be enabled.", err);
         return;
       }
+
+      // TODO: Add option to change the output on the UI
       synth.device = WebMidi.outputs[1];
       console.log("Device set to", synth.device);
     });

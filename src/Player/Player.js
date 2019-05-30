@@ -1,24 +1,43 @@
 import React from 'react';
 import WebMidi from 'webmidi';
 import lifecycle from 'react-pure-lifecycle';
-import { observable, reaction } from "mobx"
+import { observable, computed, reaction, autorun } from "mobx"
+import { now } from "mobx-utils"
+import PlayPauseButton from '../PlayPauseButton/PlayPauseButton.js';
 
 class Synth {
-  device = null;
+  @observable device = null;
+  @observable paused = false;
+  @computed get canPlayNote() {
+    return this.device !== null && !this.paused;
+  };
+  playPause = () => this.paused = !this.paused;
+  playNote = (note, channel, args) =>
+    this.canPlayNote ?
+    this.device.playNote(note, channel, args) :
+    () => console.log('Waiting for device initialization');
 }
-const synthStore = new Synth();
+const synth = new Synth();
 
 class Song {
     id = Math.random();
-    @observable notes = "";
+    @observable bpm = 120;
+    @computed get beat() {
+      return (60 * 1000) / this.bpm;
+    }
     @observable nextNote = null;
 }
-const songStore = new Song();
+const catchyTune = new Song();
 
-const play = reaction(
-  () => songStore.nextNote,
-  nextNote => synthStore.device.playNote(nextNote, 2, {duration: 1000})
+reaction(
+  () => catchyTune.nextNote,
+  nextNote => synth.playNote(nextNote, 2, {duration: 1000})
 );
+
+autorun(() => {
+  console.log("now", now(catchyTune.beat));
+  synth.playNote("D4", 2, { duration: 200 });
+});
 
 const midiDeviceMounter = {
   componentDidMount(props) {
@@ -27,8 +46,8 @@ const midiDeviceMounter = {
         console.log("WebMidi could not be enabled.", err);
         return;
       }
-      synthStore.device = WebMidi.outputs[1];
-      console.log("Device set to", synthStore.device);
+      synth.device = WebMidi.outputs[1];
+      console.log("Device set to", synth.device);
     });
   }
 };
@@ -44,11 +63,12 @@ const NotePlayer = ({ song }) => (
     </div>
 );
 
-
 const Player = () => (
     <div>
       big oof
-      <NotePlayer song={songStore} />
+      <br />
+      <PlayPauseButton synth={synth} />
+      <NotePlayer song={catchyTune} />
     </div>
 );
 

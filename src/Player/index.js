@@ -5,6 +5,7 @@ import PlayPauseButton from '../PlayPauseButton';
 import TrackListing from '../TrackListing';
 import Synth from '../Synth';
 import Song from '../Song';
+import KeyView from '../KeyView';
 import { playSongWithSynth } from '../SongAdvancer';
 
 const synth = new Synth();
@@ -29,6 +30,7 @@ const midiDeviceMounter = {
 
 const Player = () => (
     <div>
+      <KeyView songKey={catchyTune.key} />
       <TrackListing tracks={catchyTune.tracks} />
       <PlayPauseButton synth={synth} />
     </div>

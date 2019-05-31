@@ -1,14 +1,13 @@
 import { observable, computed } from "mobx"
 import { fastArp, notePerBeat, slowChord, noteEveryTwoBeats } from '../NoteResolvers';
+import { makeKey } from '../MusicTheory/Key';
+import { major } from '../MusicTheory/Scale';
+import { generateProgression } from '../Progression';
 
 class Song {
     @observable bpm = 140;
-    progression = [
-      ["C3", "E3", "G3"],
-      ["G3", "B3", "D4", "F4", "A4"],
-      ["F3", "A3", "C4", "F4"],
-      ["C3", "E3", "G3", "B4"],
-    ];
+    @observable key = makeKey("A#", major);
+    progression = generateProgression(this.key);
 
     tracks = [
       {

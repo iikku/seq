@@ -1,7 +1,7 @@
 import React from 'react';
 import lifecycle from 'react-pure-lifecycle';
 import './App.css';
-import Player from './Player'
+import Player from './ui/Player'
 
 const methods = {
   componentWillMount(props) {

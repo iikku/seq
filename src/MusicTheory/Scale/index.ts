@@ -25,5 +25,6 @@ const egyptian = new Scale("egyptian", [whole, augmentedSecond, whole, augmented
 export default Scale;
 export {
   major,
-  harmonicMinor
+  harmonicMinor,
+  egyptian
 }

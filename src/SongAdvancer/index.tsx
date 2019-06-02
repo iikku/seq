@@ -1,6 +1,7 @@
 import { observable, computed, reaction, autorun } from "mobx"
 import { now } from "mobx-utils"
 import Song from '../Song';
+import Chord from '../MusicTheory/Chord';
 import Synth from '../Synth';
 
 // Initialize the frame advancer that's advanced once per demisemihemidemisemiquaver note - 1/256th note that is.
@@ -10,20 +11,21 @@ const microBeatsPerMeasure = 256;
 // quarter notes to demisemihemidemisemiquaver notes.
 const transformBpmToMicroBeatLengthInMs = (bpm: number) => ((60 * 1000) / bpm) / (microBeatsPerMeasure / 4);
 
-class Advancer {
+class SongAdvancer {
   constructor(catchyTune: Song) {
     this.catchyTune = catchyTune;
   }
 
   catchyTune: Song;
   @observable frame: number = 0;
+  @observable currentChord: Chord | null = null;
   @computed get microBeatLengthInMs() {
     return transformBpmToMicroBeatLengthInMs(this.catchyTune.bpm);
   }
 }
 
 const playSongWithSynth = (catchyTune: Song, synth: Synth) => {
-  const advancer = new Advancer(catchyTune);
+  const advancer = new SongAdvancer(catchyTune);
 
   // Setup the song advancer to advance at microBeatLengthInMs granularity.
   // Advance the microBeats, i.e. 1/256th notes, at every call and advance the measure when needed
@@ -46,23 +48,29 @@ const playSongWithSynth = (catchyTune: Song, synth: Synth) => {
         // for all the tracks. If the arpeggiator gives us new note data, play it.
         // If the arpeggiator returns null as the nextNotes, this signifies that no
         // new note data should be sent to the synth.
-        catchyTune.tracks.forEach(track => {
-          const currentChord = catchyTune.progression[catchyTune.currentMeasure];
-          const nextNotes = track.notesFromChord(
-            currentChord,
-            catchyTune.currentMicroBeat
-          );
-
-          if (nextNotes) {
-            synth.playNote(
-              nextNotes.notes,
-              track.channel,
-              {duration: advancer.microBeatLengthInMs * nextNotes.microBeats}
+        advancer.currentChord = catchyTune.progression[catchyTune.currentMeasure];
+        if (advancer.currentChord) {
+          catchyTune.tracks.forEach(track => {
+            const nextNotes = track.notesFromChord(
+              advancer.currentChord!,
+              catchyTune.currentMicroBeat
             );
-          }
-        });
+
+            if (nextNotes) {
+              synth.playNote(
+                nextNotes.notes,
+                track.channel,
+                {duration: advancer.microBeatLengthInMs * nextNotes.microBeats}
+              );
+            }
+          });
       }
+    }
   );
+
+
+  return advancer;
 };
 
+export default SongAdvancer;
 export { playSongWithSynth }

@@ -1,21 +1,15 @@
+import ChordQuality from '../ChordQuality';
+
 class Chord {
-  constructor(name: string, chordByIntegerNotation: number[]) {
-    this.name = name;
-    this.integerNotation = chordByIntegerNotation;
+  constructor(base: string, quality: ChordQuality, notes: string[]) {
+    this.base = base;
+    this.quality = quality;
+    this.notes = notes;
   }
 
-  name: string;
-  integerNotation: number[];
+  base: string;
+  quality: ChordQuality;
+  notes: string[];
 }
 
-// Chords
-const majorThird = new Chord('major third', [0, 4, 7]);
-const majorSeventh = new Chord('major seventh', [0, 4, 7, 11]);
-const dominantSeventh = new Chord('dominant seventh', [0, 4, 7, 10]);
-
 export default Chord;
-export {
-  majorThird,
-  majorSeventh,
-  dominantSeventh
-};

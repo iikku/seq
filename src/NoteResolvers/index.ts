@@ -1,3 +1,5 @@
+import Chord from '../MusicTheory/Chord';
+
 // 1/256th note to exact note timings or null if not exact
 // TODO: Add an empty optional monad instead of null
 const _256thToExactOrNull = (d: number, divisor: number) => Math.floor(d / divisor) === d / divisor ? d / divisor : null
@@ -13,11 +15,11 @@ const toBeat = (n: number) => ({
 // quarter notes to 1/256th notes
 const beatToMicroBeat = (beat: number) => beat * 64;
 
-const fastArp = (chord: string[], demisemihemidemisemiquaver: number) => {
+const fastArp = (chord: Chord, demisemihemidemisemiquaver: number) => {
   const beat = toBeat(demisemihemidemisemiquaver)._32th;
   if (beat !== null) {
     return {
-      notes: [chord[beat % chord.length]],
+      notes: [chord.notes[beat % chord.notes.length]],
       microBeats: 8
     };
   } else {
@@ -25,11 +27,11 @@ const fastArp = (chord: string[], demisemihemidemisemiquaver: number) => {
   }
 }
 
-const notePerBeat = (chord: string[], demisemihemidemisemiquaver: number) => {
+const notePerBeat = (chord: Chord, demisemihemidemisemiquaver: number) => {
   const beat = toBeat(demisemihemidemisemiquaver).quarter;
   if (beat !== null) {
     return {
-      notes: [chord[beat % chord.length]],
+      notes: [chord.notes[beat % chord.notes.length]],
       microBeats: beatToMicroBeat(1)
     };
   } else {
@@ -37,12 +39,12 @@ const notePerBeat = (chord: string[], demisemihemidemisemiquaver: number) => {
   }
 }
 
-const noteEveryTwoBeats = (chord: string[], demisemihemidemisemiquaver: number) => {
+const noteEveryTwoBeats = (chord: Chord, demisemihemidemisemiquaver: number) => {
   const beat = toBeat(demisemihemidemisemiquaver).half;
 
   if (beat !== null) {
     return {
-      notes: [chord[beat % chord.length]],
+      notes: [chord.notes[beat % chord.notes.length]],
       microBeats: beatToMicroBeat(2)
     };
   } else {
@@ -50,12 +52,12 @@ const noteEveryTwoBeats = (chord: string[], demisemihemidemisemiquaver: number) 
   }
 }
 
-const slowChord = (chord: string[], demisemihemidemisemiquaver: number) => {
+const slowChord = (chord: Chord, demisemihemidemisemiquaver: number) => {
   const beat = toBeat(demisemihemidemisemiquaver).quarter;
 
   if (beat === 1) {
     return {
-      notes: chord,
+      notes: chord.notes,
       microBeats: beatToMicroBeat(3)
     };
   } else {

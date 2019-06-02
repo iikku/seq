@@ -3,13 +3,14 @@ import { fastArp, notePerBeat, slowChord, noteEveryTwoBeats } from '../NoteReso
 import { makeKey } from '../MusicTheory/Key';
 import { major } from '../MusicTheory/Scale';
 import Key from '../MusicTheory/Key';
+import Chord from '../MusicTheory/Chord';
 import { generateProgression } from '../Progression';
 import Track from '../Track';
 
 class Song {
     @observable bpm: number = 140;
-    @observable key: Key = makeKey("A#", major);
-    progression: string[][] = generateProgression(this.key);
+    @observable key: Key = makeKey("E#", major);
+    progression: Chord[] = generateProgression(this.key);
 
     tracks: Track[] = [
       new Track(

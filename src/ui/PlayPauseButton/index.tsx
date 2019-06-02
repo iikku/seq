@@ -1,6 +1,6 @@
 import React from 'react';
 import { observer } from "mobx-react"
-import Synth from '../Synth';
+import Synth from '../../Synth';
 
 const PlayPauseButton = observer(({ synth } : {synth: Synth | null }) => (
   synth

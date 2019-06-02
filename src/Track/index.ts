@@ -1,8 +1,10 @@
+import Chord from '../MusicTheory/Chord';
+
 class Track {
   constructor(
     name: string,
     channel: number,
-    notesFromChord: (chord: string[], microBeat: number) =>
+    notesFromChord: (chord: Chord, microBeat: number) =>
                     { notes: string[], microBeats: number } | null
   ) {
     this.name = name;
@@ -12,7 +14,7 @@ class Track {
 
   name: string;
   channel: number;
-  notesFromChord: (chord: string[], microBeat: number) => { notes: string[], microBeats: number } | null;
+  notesFromChord: (chord: Chord, microBeat: number) => { notes: string[], microBeats: number } | null;
 }
 
 export default Track;

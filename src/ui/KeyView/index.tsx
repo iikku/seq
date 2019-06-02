@@ -1,6 +1,6 @@
 import React from 'react';
 import { observer } from "mobx-react"
-import Key from '../MusicTheory/Key';
+import Key from '../../MusicTheory/Key';
 
 const KeyView = observer(({ songKey } : { songKey : Key }) => (
   <div>

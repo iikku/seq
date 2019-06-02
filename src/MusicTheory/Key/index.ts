@@ -1,5 +1,6 @@
 import { notes } from '../';
 import Chord from '../Chord';
+import ChordQuality from '../ChordQuality';
 import Scale from '../Scale';
 
 class Key {
@@ -15,19 +16,20 @@ class Key {
 
   // degree: integer
   // chord: MusicTheory/Chord
-  chordOfDegree = (degree: number, chord: Chord) => {
-      console.log("Generating a", chord.name, "chord of degree", degree, "in the key of", this.base);
+  chordOfDegree = (degree: number, quality: ChordQuality) => {
+      console.log("Generating a", quality.name, "chord of degree", degree, "in the key of", this.base);
 
       const degreeAsIndex = degree - 1;
       const baseNote = this.notesOfKey[degreeAsIndex];
       const baseNoteIndex = notes.findIndex(note => note === baseNote);
-      const generatedChord = chord.integerNotation
+      const generatedChord = quality.integerNotation
         .map(index => (baseNoteIndex + (index)) % notes.length)
         .map(index => notes[index])
         .map(noteName => noteName + "4");
 
       console.log("Generated", generatedChord);
-      return generatedChord;
+
+      return new Chord(baseNote, quality, generatedChord);
   }
 }
 

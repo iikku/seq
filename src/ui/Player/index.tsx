@@ -43,7 +43,7 @@ const Player = observer(() => (
       <KeyView songKey={data.catchyTune.key} />
       <CurrentChordView chord={data.advancer.currentChord} />
       <TrackListing tracks={data.catchyTune.tracks} />
-      <PlayPauseButton synth={data.synth} />
+      <PlayPauseButton advancer={data.advancer} />
     </div>
     :
     <div>

@@ -18,6 +18,8 @@ class SongAdvancer {
 
   catchyTune: Song;
   @observable frame: number = 0;
+  @observable paused: boolean = true;
+  playPause = () => this.paused = !this.paused;
   @observable currentChord: Chord | null = null;
   @computed get microBeatLengthInMs() {
     return transformBpmToMicroBeatLengthInMs(this.catchyTune.bpm);
@@ -31,11 +33,13 @@ const playSongWithSynth = (catchyTune: Song, synth: Synth) => {
   // Advance the microBeats, i.e. 1/256th notes, at every call and advance the measure when needed
   autorun(() => {
     // This will advance the song to the next step
-    advancer.frame = now(advancer.microBeatLengthInMs);
+    if (!advancer.paused) {
+      advancer.frame = now(advancer.microBeatLengthInMs);
 
-    catchyTune.currentMicroBeat = (catchyTune.currentMicroBeat + 1) % microBeatsPerMeasure;
-    if (catchyTune.currentMicroBeat === 0) {
-      catchyTune.currentMeasure = (catchyTune.currentMeasure + 1) % catchyTune.progression.length;
+      catchyTune.currentMicroBeat = (catchyTune.currentMicroBeat + 1) % microBeatsPerMeasure;
+      if (catchyTune.currentMicroBeat === 0) {
+        catchyTune.currentMeasure = (catchyTune.currentMeasure + 1) % catchyTune.progression.length;
+      }
     }
   });
 

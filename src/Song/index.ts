@@ -9,7 +9,7 @@ import Track from '../Track';
 
 class Song {
     @observable bpm: number = 140;
-    @observable key: Key = makeKey("E#", major);
+    @observable key: Key = makeKey("E", major);
     progression: Chord[] = generateProgression(this.key);
 
     tracks: Track[] = [

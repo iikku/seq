@@ -1,13 +1,13 @@
 import React from 'react';
 import { observer } from "mobx-react"
-import Synth from '../../Synth';
+import SongAdvancer from '../../SongAdvancer';
 
-const PlayPauseButton = observer(({ synth } : {synth: Synth | null }) => (
-  synth
+const PlayPauseButton = observer(({ advancer } : { advancer: SongAdvancer | null }) => (
+  advancer
   ?
   <button
-    onClick={() => synth.playPause()}>
-    { !synth.paused ? "playing" : "paused" }
+    onClick={() => advancer.playPause()}>
+    { !advancer.paused ? "playing" : "paused" }
   </button>
   :
   <span>

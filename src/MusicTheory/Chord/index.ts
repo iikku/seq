@@ -1,8 +1,11 @@
 class Chord {
-  constructor(name, chordByIntegerNotation) {
+  constructor(name: string, chordByIntegerNotation: number[]) {
     this.name = name;
     this.integerNotation = chordByIntegerNotation;
   }
+
+  name: string;
+  integerNotation: number[];
 }
 
 // Chords

@@ -7,12 +7,13 @@ import Synth from '../Synth';
 import Song from '../Song';
 import KeyView from '../KeyView';
 import { playSongWithSynth } from '../SongAdvancer';
+import { observer } from "mobx-react"
 
-const synth = new Synth();
 const catchyTune = new Song();
+const synth = new Synth();
 
 const midiDeviceMounter = {
-  componentDidMount(props) {
+  componentWillMount() {
     WebMidi.enable(function (err) {
       if (err) {
         console.log("WebMidi could not be enabled.", err);
@@ -21,6 +22,7 @@ const midiDeviceMounter = {
 
       // TODO: Add option to change the output on the UI
       synth.device = WebMidi.outputs[0];
+
       console.log("Device set to", synth.device);
 
       playSongWithSynth(catchyTune, synth);
@@ -28,12 +30,12 @@ const midiDeviceMounter = {
   }
 };
 
-const Player = () => (
+const Player = observer(() => (
     <div>
       <KeyView songKey={catchyTune.key} />
       <TrackListing tracks={catchyTune.tracks} />
       <PlayPauseButton synth={synth} />
     </div>
-);
+));
 
 export default lifecycle(midiDeviceMounter)(Player);

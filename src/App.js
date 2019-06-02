@@ -4,13 +4,12 @@ import './App.css';
 import Player from './Player'
 
 const methods = {
-  componentDidMount(props) {
+  componentWillMount(props) {
     console.log("Welcome to the Big Oof Seq");
   }
 };
 
 function BigOofSeq() {
-
   return (
     <div className="App">
       <header className="App-header">

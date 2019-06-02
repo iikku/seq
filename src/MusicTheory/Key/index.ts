@@ -1,15 +1,21 @@
 import { notes } from '../';
+import Chord from '../Chord';
+import Scale from '../Scale';
 
 class Key {
-  constructor (name, base, notesOfKey) {
+  constructor (name: string, base: string, notesOfKey: string[]) {
     this.name = name;
     this.base = base;
     this.notesOfKey = notesOfKey;
   }
 
+  name: string;
+  base: string;
+  notesOfKey: string[];
+
   // degree: integer
   // chord: MusicTheory/Chord
-  chordOfDegree = (degree, chord) => {
+  chordOfDegree = (degree: number, chord: Chord) => {
       console.log("Generating a", chord.name, "chord of degree", degree, "in the key of", this.base);
 
       const degreeAsIndex = degree - 1;
@@ -25,10 +31,8 @@ class Key {
   }
 }
 
-// base: note name
-// scale: MusicTheory/Scale
-const makeKey = (base, scale) => {
-  const notesOfKey = [];
+const makeKey = (base: string, scale: Scale) => {
+  const notesOfKey: string[] = [];
   let prevNote = base;
   scale.intervals.forEach(interval => {
     notesOfKey.push(prevNote);

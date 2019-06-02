@@ -1,8 +1,11 @@
 class Scale {
-  constructor (name, intervals) {
+  constructor (name: string, intervals: number[]) {
     this.name = name;
     this.intervals = intervals;
   }
+
+  name: string;
+  intervals: number[];
 }
 
 // Intervals

@@ -1,6 +1,6 @@
 import { observable, computed, reaction, autorun } from "mobx"
 import { now } from "mobx-utils"
-import Song from '../Song';
+import Song from '../SongStructure/Song';
 import Chord from '../MusicTheory/Chord';
 import Synth from '../Synth';
 
@@ -17,7 +17,16 @@ class SongAdvancer {
   }
 
   catchyTune: Song;
+  // frame is an automatically updated notifier of the song having advanced
   @observable frame: number = 0;
+
+  // Song consists of n sections
+  // Section consists of n measures
+  // Measure consists of 256 microBeats
+  currentSection: number = 0;
+  currentMeasure: number = 0;
+  currentMicroBeat: number = 0;
+
   @observable paused: boolean = true;
   playPause = () => this.paused = !this.paused;
   @observable currentChord: Chord | null = null;
@@ -36,9 +45,13 @@ const playSongWithSynth = (catchyTune: Song, synth: Synth) => {
     if (!advancer.paused) {
       advancer.frame = now(advancer.microBeatLengthInMs);
 
-      catchyTune.currentMicroBeat = (catchyTune.currentMicroBeat + 1) % microBeatsPerMeasure;
-      if (catchyTune.currentMicroBeat === 0) {
-        catchyTune.currentMeasure = (catchyTune.currentMeasure + 1) % catchyTune.progression.length;
+      advancer.currentMicroBeat = (advancer.currentMicroBeat + 1) % microBeatsPerMeasure;
+      if (advancer.currentMicroBeat === 0) {
+        advancer.currentMeasure = (advancer.currentMeasure + 1) % catchyTune.structure[advancer.currentSection].measures.length;
+        
+        if (advancer.currentMeasure === 0) {
+          advancer.currentSection = (advancer.currentSection + 1) % catchyTune.structure.length;
+        }
       }
     }
   });
@@ -52,12 +65,19 @@ const playSongWithSynth = (catchyTune: Song, synth: Synth) => {
         // for all the tracks. If the arpeggiator gives us new note data, play it.
         // If the arpeggiator returns null as the nextNotes, this signifies that no
         // new note data should be sent to the synth.
-        advancer.currentChord = catchyTune.progression[catchyTune.currentMeasure];
+        advancer.currentChord = catchyTune.chordOfTheMoment(
+          advancer.currentSection,
+          advancer.currentMeasure,
+          advancer.currentMicroBeat
+        );
+
         if (advancer.currentChord) {
           catchyTune.tracks.forEach(track => {
-            const nextNotes = track.notesFromChord(
-              advancer.currentChord!,
-              catchyTune.currentMicroBeat
+            const nextNotes = track.resolveNextNotes(
+              advancer.currentSection,
+              advancer.currentMeasure,
+              advancer.currentMicroBeat,
+              advancer.currentChord!
             );
 
             if (nextNotes) {

@@ -4,7 +4,7 @@ import lifecycle from 'react-pure-lifecycle';
 import PlayPauseButton from '../PlayPauseButton';
 import TrackListing from '../TrackListing';
 import Synth from '../../Synth';
-import Song from '../../Song';
+import Song from '../../SongStructure/Song';
 import KeyView from '../KeyView';
 import CurrentChordView from '../CurrentChordView';
 import SongAdvancer, { playSongWithSynth } from '../../SongAdvancer';

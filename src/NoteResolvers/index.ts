@@ -15,11 +15,21 @@ const toBeat = (n: number) => ({
 // quarter notes to 1/256th notes
 const beatToMicroBeat = (beat: number) => beat * 64;
 
-const fastArp = (chord: Chord, demisemihemidemisemiquaver: number) => {
+export type BeatBasedNoteResolver =
+  (microBeat: number, chord: Chord, targetOctave: number) =>
+  { notes: string[], microBeats: number } | null;
+
+export type MeasureBasedNoteResolver =
+  (measure: number) => BeatBasedNoteResolver;
+
+export type SectionBasedNoteResolver =
+  (section: number) => MeasureBasedNoteResolver;
+
+const fastArp = (demisemihemidemisemiquaver: number, chord: Chord, targetOctave: number) => {
   const beat = toBeat(demisemihemidemisemiquaver)._32th;
   if (beat !== null) {
     return {
-      notes: [chord.notes[beat % chord.notes.length]],
+      notes: [chord.notes[beat % chord.notes.length] + targetOctave],
       microBeats: 8
     };
   } else {
@@ -27,11 +37,11 @@ const fastArp = (chord: Chord, demisemihemidemisemiquaver: number) => {
   }
 }
 
-const notePerBeat = (chord: Chord, demisemihemidemisemiquaver: number) => {
+const notePerBeat = (demisemihemidemisemiquaver: number, chord: Chord, targetOctave: number) => {
   const beat = toBeat(demisemihemidemisemiquaver).quarter;
   if (beat !== null) {
     return {
-      notes: [chord.notes[beat % chord.notes.length]],
+      notes: [chord.notes[beat % chord.notes.length] + targetOctave],
       microBeats: beatToMicroBeat(1)
     };
   } else {
@@ -39,12 +49,12 @@ const notePerBeat = (chord: Chord, demisemihemidemisemiquaver: number) => {
   }
 }
 
-const noteEveryTwoBeats = (chord: Chord, demisemihemidemisemiquaver: number) => {
+const noteEveryTwoBeats = (demisemihemidemisemiquaver: number, chord: Chord, targetOctave: number) => {
   const beat = toBeat(demisemihemidemisemiquaver).half;
 
   if (beat !== null) {
     return {
-      notes: [chord.notes[beat % chord.notes.length]],
+      notes: [chord.notes[beat % chord.notes.length] + targetOctave],
       microBeats: beatToMicroBeat(2)
     };
   } else {
@@ -52,12 +62,12 @@ const noteEveryTwoBeats = (chord: Chord, demisemihemidemisemiquaver: number) => 
   }
 }
 
-const slowChord = (chord: Chord, demisemihemidemisemiquaver: number) => {
+const slowChord = (demisemihemidemisemiquaver: number, chord: Chord, targetOctave: number) => {
   const beat = toBeat(demisemihemidemisemiquaver).quarter;
 
   if (beat === 1) {
     return {
-      notes: chord.notes,
+      notes: chord.notes.map(note => note + targetOctave),
       microBeats: beatToMicroBeat(3)
     };
   } else {
@@ -65,9 +75,35 @@ const slowChord = (chord: Chord, demisemihemidemisemiquaver: number) => {
   }
 }
 
+const randomMeasureBasedNoteResolver = (measure: number) => {
+    switch (Math.floor(Math.random() * 4)) {
+      case 0: return notePerBeat;
+      case 1: return fastArp;
+      case 2: return slowChord;
+      case 3: return noteEveryTwoBeats;
+    }
+    return noteEveryTwoBeats;
+  };
+
+const fixedMeasureBasedNoteResolver =
+  (resolver: BeatBasedNoteResolver) =>
+    (measure: number) => resolver;
+
+const defaultSectionBasedNoteResolver =
+  (section: number) => randomMeasureBasedNoteResolver;
+
+const fixedSectionBasedNoteResolver =
+  (resolver: MeasureBasedNoteResolver) =>
+    (section: number) => resolver;
+
 export {
   notePerBeat,
   fastArp,
   slowChord,
-  noteEveryTwoBeats
+  noteEveryTwoBeats,
+
+  fixedMeasureBasedNoteResolver,
+  randomMeasureBasedNoteResolver,
+  fixedSectionBasedNoteResolver,
+  defaultSectionBasedNoteResolver
 };

@@ -14,9 +14,23 @@ class Key {
   base: string;
   notesOfKey: string[];
 
-  // degree: integer
-  // chord: MusicTheory/Chord
-  chordOfDegree = (degree: number, quality: ChordQuality) => {
+  chordOfDegree = (degree: number) => {
+    console.log("Generating a chord of degree", degree, "in the key of", this.base);
+
+    const degreeAsIndex = degree - 1;
+    const baseNote = this.notesOfKey[degreeAsIndex];
+    const third = this.notesOfKey[(degreeAsIndex + 2) % this.notesOfKey.length];
+    const fifth = this.notesOfKey[(degreeAsIndex + 5) % this.notesOfKey.length];
+    const generatedChord = [baseNote, third, fifth];
+
+    console.log("Generated", generatedChord);
+
+    // TODO notesOfKey should be semitone-based so that the quality could be deduced.
+    const mockQuality = new ChordQuality("something", []);
+    return new Chord(baseNote, mockQuality, generatedChord);
+  }
+
+  chordOfDegreeAndQuality = (degree: number, quality: ChordQuality) => {
       console.log("Generating a", quality.name, "chord of degree", degree, "in the key of", this.base);
 
       const degreeAsIndex = degree - 1;
@@ -25,7 +39,7 @@ class Key {
       const generatedChord = quality.integerNotation
         .map(index => (baseNoteIndex + (index)) % notes.length)
         .map(index => notes[index])
-        .map(noteName => noteName + "4");
+        .map(noteName => noteName);
 
       console.log("Generated", generatedChord);
 

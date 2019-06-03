@@ -8,7 +8,7 @@ class Synth {
   playNote = (note: string[], channel: number, args: object) =>
     this.canPlayNote ?
     (() => {
-      console.log("playing", note, "at", channel, "with", args);
+      // console.log("playing", note, "at", channel, "with", args);
       if (note) this.device.playNote(note, channel, args);
     })() :
     () => console.log('Waiting for device initialization');

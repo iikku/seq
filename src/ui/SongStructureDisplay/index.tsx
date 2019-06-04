@@ -3,6 +3,7 @@ import { observer } from "mobx-react";
 import Song from '../../SongStructure/Song';
 import SongAdvancer from '../../SongAdvancer';
 import SectionBlock from './SectionBlock';
+import './SongStructureDisplay.scss';
 
 const SongStructureDisplay = observer(
     ({ song, advancer } : { song : Song, advancer : SongAdvancer }) => (

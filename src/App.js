@@ -1,6 +1,6 @@
 import React from 'react';
 import lifecycle from 'react-pure-lifecycle';
-import './App.css';
+import './App.scss';
 import Player from './ui/Player'
 
 const methods = {

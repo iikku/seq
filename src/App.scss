@@ -1,6 +1,3 @@
-.App {
-  text-align: center;
-}
 html {
   background-color: #444;
   font-size: calc(10px + 2vmin);
@@ -22,24 +19,6 @@ header {
   align-items: center;
   justify-content: center;
 }
-
-.songStructure {
-  border-left: pink solid thick;
-  display: flex;
-  flex-direction: row;
-}
-.songStructure .section {
-  background-color: #282c34;
-  margin: 0.1em;
-  padding: 0.1em;
-}
-.songStructure .section.active {
-  background-color: purple;
-}
-.songStructure .section.active .measure.active {
-  background-color: #FF33CC;
-}
-
 
 ul {
   list-style: none;

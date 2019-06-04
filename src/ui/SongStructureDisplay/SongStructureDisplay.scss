@@ -1,0 +1,16 @@
+.songStructure {
+  border-left: pink solid thick;
+  display: flex;
+  flex-direction: row;
+  .section {
+    background-color: #282c34;
+    margin: 0.1em;
+    padding: 0.1em;
+    &.active {
+      background-color: purple;
+      .measure.active {
+        background-color: #FF33CC;
+      }
+    }
+  }
+}

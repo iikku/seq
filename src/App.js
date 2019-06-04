@@ -11,13 +11,11 @@ const methods = {
 
 function BigOofSeq() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <p>
+    <div>
+      <header>
           The Big Oof Seq
-        </p>
-        <Player />
       </header>
+      <Player />
     </div>
   );
 }

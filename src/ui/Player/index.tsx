@@ -7,6 +7,7 @@ import Synth from '../../Synth';
 import Song from '../../SongStructure/Song';
 import KeyView from '../KeyView';
 import CurrentChordView from '../CurrentChordView';
+import SongStructureDisplay from '../SongStructureDisplay';
 import SongAdvancer, { playSongWithSynth } from '../../SongAdvancer';
 import { observer } from "mobx-react"
 import { observable } from "mobx"
@@ -39,8 +40,9 @@ const midiDeviceMounter = {
 
 const Player = observer(() => (
     data.advancer ?
-    <div>
+    <div className="player">
       <KeyView songKey={data.catchyTune.key} />
+      <SongStructureDisplay song={data.catchyTune} advancer={data.advancer} />
       <CurrentChordView chord={data.advancer.currentChord} />
       <TrackListing tracks={data.catchyTune.tracks} />
       <PlayPauseButton advancer={data.advancer} />

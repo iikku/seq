@@ -23,8 +23,8 @@ class SongAdvancer {
   // Song consists of n sections
   // Section consists of n measures
   // Measure consists of 256 microBeats
-  currentSection: number = 0;
-  currentMeasure: number = 0;
+  @observable currentSection: number = 0;
+  @observable currentMeasure: number = 0;
   currentMicroBeat: number = 0;
 
   @observable paused: boolean = true;
@@ -48,7 +48,7 @@ const playSongWithSynth = (catchyTune: Song, synth: Synth) => {
       advancer.currentMicroBeat = (advancer.currentMicroBeat + 1) % microBeatsPerMeasure;
       if (advancer.currentMicroBeat === 0) {
         advancer.currentMeasure = (advancer.currentMeasure + 1) % catchyTune.structure[advancer.currentSection].measures.length;
-        
+
         if (advancer.currentMeasure === 0) {
           advancer.currentSection = (advancer.currentSection + 1) % catchyTune.structure.length;
         }

@@ -3,7 +3,7 @@ import { observable, computed } from "mobx"
 class Synth {
   @observable device: any; // WebMidi device
   @computed get canPlayNote() {
-    return this.device !== null;
+    return this.device !== undefined;
   };
   playNote = (note: string[], channel: number, args: object) =>
     this.canPlayNote ?

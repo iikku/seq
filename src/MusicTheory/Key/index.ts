@@ -4,15 +4,17 @@ import ChordQuality from '../ChordQuality';
 import Scale from '../Scale';
 
 class Key {
-  constructor (name: string, base: string, notesOfKey: string[]) {
+  constructor (name: string, base: string, notesOfKey: string[], qualitiesByDegree: ChordQuality[]) {
     this.name = name;
     this.base = base;
     this.notesOfKey = notesOfKey;
+    this.qualitiesByDegree = qualitiesByDegree;
   }
 
   name: string;
   base: string;
   notesOfKey: string[];
+  qualitiesByDegree: ChordQuality[];
 
   chordOfDegree = (degree: number) => {
     console.log("Generating a chord of degree", degree, "in the key of", this.base);
@@ -25,9 +27,7 @@ class Key {
 
     console.log("Generated", generatedChord);
 
-    // TODO notesOfKey should be semitone-based so that the quality could be deduced.
-    const mockQuality = new ChordQuality("something", []);
-    return new Chord(baseNote, mockQuality, generatedChord);
+    return new Chord(baseNote, this.qualitiesByDegree[degreeAsIndex], generatedChord);
   }
 
   chordOfDegreeAndQuality = (degree: number, quality: ChordQuality) => {
@@ -58,7 +58,7 @@ const makeKey = (base: string, scale: Scale) => {
   });
 
   console.log("Generated the key of", base, scale.name, "consisting of", notesOfKey);
-  return new Key(scale.name, base, notesOfKey);
+  return new Key(scale.name, base, notesOfKey, scale.chordQualities);
 }
 
 export default Key;

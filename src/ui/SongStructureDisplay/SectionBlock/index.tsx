@@ -12,7 +12,8 @@ const SectionBlock = observer(
       <MeasureBlock
         measure={measure}
         advancer={advancer}
-        active={advancer.currentMeasure === index} />
+        active={advancer.currentMeasure === index}
+        key={index} />
     )}
   </div>
 ));

@@ -15,7 +15,8 @@ const SongStructureDisplay = observer(
         <SectionBlock
           section={section}
           advancer={advancer}
-          active={advancer.currentSection === index} />
+          active={advancer.currentSection === index}
+          key={index} />
     )}
     <br />
   </div>

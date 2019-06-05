@@ -15,8 +15,14 @@ const toBeat = (n: number) => ({
 // quarter notes to 1/256th notes
 const beatToMicroBeat = (beat: number) => beat * 64;
 
+interface NoteRequest {
+  microBeat: number,
+  chord: Chord,
+  targetOctave: number
+};
+
 export type BeatBasedNoteResolver =
-  (microBeat: number, chord: Chord, targetOctave: number) =>
+  (noteRequest: NoteRequest) =>
   { notes: string[], microBeats: number } | null;
 
 export type MeasureBasedNoteResolver =
@@ -25,8 +31,64 @@ export type MeasureBasedNoteResolver =
 export type SectionBasedNoteResolver =
   (section: number) => MeasureBasedNoteResolver;
 
-const fastArp = (demisemihemidemisemiquaver: number, chord: Chord, targetOctave: number) => {
-  const beat = toBeat(demisemihemidemisemiquaver)._32th;
+class NoteData {
+  constructor(
+    note: number | null,
+    startAt: number,
+    duration: number
+  ) {
+    this.note = note;
+    this.startAt = startAt;
+    this.duration = duration;
+  }
+  note: number | null;
+  startAt: number;
+  duration: number;
+};
+
+const fromMotif = function() {
+  const motif : NoteData[] = [];
+  let shouldAddUpTo256 = 0;
+  while (shouldAddUpTo256 < 256) {
+    const shouldPlayNote = Math.random() > 0.2;
+    // TODO incorporate octaves and notes outside the triad
+    const note = shouldPlayNote ? Math.floor(Math.random() * 3) : null;
+    const length = Math.floor(Math.random() * 8) * 32;
+    motif.push(new NoteData(note, length, shouldAddUpTo256));
+
+    shouldAddUpTo256 += length;
+  }
+
+  return (noteRequest : NoteRequest) => {
+    const noteData = motif
+      .find(noteData => noteData.startAt === noteRequest.microBeat);
+
+    if (noteData === undefined) return null;
+    if (noteData.note === null) return null;
+    return {
+      notes: [noteRequest.chord.notes[noteData.note] + noteRequest.targetOctave],
+      microBeats: noteData.duration
+    };
+  }
+};
+
+const randomMeasureBasedMotif = function() {
+  const motif1 = fromMotif();
+  const motif2 = fromMotif();
+  const motif3 = fromMotif();
+  return (measure: number) => {
+    switch (measure) {
+      case 0: return motif1;
+      case 1: return motif2;
+      case 2: return motif1;
+      case 3: return motif3;
+    }
+    return noteEveryTwoBeats;
+  };
+}();
+
+const fastArp = ({microBeat, chord, targetOctave} : NoteRequest) => {
+  const beat = toBeat(microBeat)._32th;
   if (beat !== null) {
     return {
       notes: [chord.notes[beat % chord.notes.length] + targetOctave],
@@ -37,8 +99,8 @@ const fastArp = (demisemihemidemisemiquaver: number, chord: Chord, targetOctave:
   }
 }
 
-const notePerBeat = (demisemihemidemisemiquaver: number, chord: Chord, targetOctave: number) => {
-  const beat = toBeat(demisemihemidemisemiquaver).quarter;
+const notePerBeat = ({microBeat, chord, targetOctave} : NoteRequest) => {
+  const beat = toBeat(microBeat).quarter;
   if (beat !== null) {
     return {
       notes: [chord.notes[beat % chord.notes.length] + targetOctave],
@@ -49,8 +111,8 @@ const notePerBeat = (demisemihemidemisemiquaver: number, chord: Chord, targetOct
   }
 }
 
-const noteEveryTwoBeats = (demisemihemidemisemiquaver: number, chord: Chord, targetOctave: number) => {
-  const beat = toBeat(demisemihemidemisemiquaver).half;
+const noteEveryTwoBeats = ({microBeat, chord, targetOctave} : NoteRequest) => {
+  const beat = toBeat(microBeat).half;
 
   if (beat !== null) {
     return {
@@ -62,8 +124,8 @@ const noteEveryTwoBeats = (demisemihemidemisemiquaver: number, chord: Chord, tar
   }
 }
 
-const slowChord = (demisemihemidemisemiquaver: number, chord: Chord, targetOctave: number) => {
-  const beat = toBeat(demisemihemidemisemiquaver).quarter;
+const slowChord = ({microBeat, chord, targetOctave} : NoteRequest) => {
+  const beat = toBeat(microBeat).quarter;
 
   if (beat === 1) {
     return {
@@ -97,6 +159,7 @@ const fixedSectionBasedNoteResolver =
     (section: number) => resolver;
 
 export {
+  randomMeasureBasedMotif,
   notePerBeat,
   fastArp,
   slowChord,

@@ -1,6 +1,7 @@
 import { observable } from "mobx"
 import {
-  noteEveryTwoBeats,
+  noteEveryTwoBeats, randomMeasureBasedMotif,
+  slowChord,
   fixedMeasureBasedNoteResolver, fixedSectionBasedNoteResolver,
   defaultSectionBasedNoteResolver
 } from '../../NoteResolvers';
@@ -19,20 +20,20 @@ class Song {
       new Track(
         "Bass",
         1,
-        2,
+        3,
         fixedSectionBasedNoteResolver(fixedMeasureBasedNoteResolver(noteEveryTwoBeats))
       ),
       new Track(
         "Pad",
         2,
-        3,
-        defaultSectionBasedNoteResolver
+        4,
+        fixedSectionBasedNoteResolver(fixedMeasureBasedNoteResolver(slowChord))
       ),
       new Track(
         "Lead",
         3,
         4,
-        defaultSectionBasedNoteResolver
+        fixedSectionBasedNoteResolver(randomMeasureBasedMotif)
       )
     ];
 

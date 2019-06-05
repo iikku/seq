@@ -27,14 +27,14 @@ class Track {
     section: number, measure: number, microBeat: number, chord: Chord
   ) {
     if (measure === 0 && microBeat === 0) this.clearCachedNoteResolvers(); // Yikes
-    if (this.cachedMeasureBasedNoteResolver === null) {
+    // if (this.cachedMeasureBasedNoteResolver === null) {
       this.cachedMeasureBasedNoteResolver = this.noteResolver(section);
-    }
-    if (this.cachedBeatBasedNoteResolver === null) {
+    // }
+    // if (this.cachedBeatBasedNoteResolver === null) {
       this.cachedBeatBasedNoteResolver = this.cachedMeasureBasedNoteResolver(measure);
-    }
+    // }
 
-    return this.cachedBeatBasedNoteResolver(microBeat, chord, this.targetOctave);
+    return this.cachedBeatBasedNoteResolver({microBeat, chord, targetOctave: this.targetOctave});
   }
 
   clearCachedNoteResolvers() {
